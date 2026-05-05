@@ -1,0 +1,15 @@
+.git
+.github
+__pycache__
+*.pyc
+.venv
+venv
+node_modules
+web/dist
+backend/data/generated
+backend/data/copilot_uploads
+backend/data/copilot_lake
+*.db
+*.sqlite3
+.env
+.DS_Store

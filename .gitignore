@@ -7,10 +7,14 @@ venv/
 # Node
 node_modules/
 dist/
+web/dist/
 
 # Data
 backend/data/generated/
+backend/data/copilot_uploads/
+backend/data/copilot_lake/
 *.db
+*.sqlite3
 
 # Env
 .env

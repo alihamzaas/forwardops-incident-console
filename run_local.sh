@@ -13,7 +13,7 @@ PYTHON_CANDIDATES+=("/opt/anaconda3/bin/python3" "python3" "/usr/local/bin/pytho
 RESOLVED_PYTHON=""
 for candidate in "${PYTHON_CANDIDATES[@]}"; do
   if [[ -x "$candidate" ]] || command -v "$candidate" >/dev/null 2>&1; then
-    if "$candidate" -c "import pandas, pyarrow" >/dev/null 2>&1; then
+    if "$candidate" -c "import fastapi, uvicorn, pandas, pyarrow, plotly" >/dev/null 2>&1; then
       RESOLVED_PYTHON="$candidate"
       break
     fi
@@ -21,10 +21,16 @@ for candidate in "${PYTHON_CANDIDATES[@]}"; do
 done
 
 if [[ -z "$RESOLVED_PYTHON" ]]; then
-  echo "Could not find a Python interpreter with pandas and pyarrow installed."
-  echo "Set PYTHON_BIN=/path/to/python3 and try again."
+  echo "Could not find a Python interpreter with the FastAPI copilot dependencies installed."
+  echo "Install them with:"
+  echo "  python3 -m pip install -r backend/requirements.txt"
+  echo "Then run this script again. You can also use Docker Compose:"
+  echo "  docker compose up --build"
   exit 1
 fi
 
 echo "Using Python: $RESOLVED_PYTHON"
-exec "$RESOLVED_PYTHON" -m backend.main
+exec "$RESOLVED_PYTHON" -m uvicorn backend.fastapi_app:app \
+  --host "${LISTEN_HOST:-127.0.0.1}" \
+  --port "${PORT:-8000}" \
+  --reload

@@ -2,82 +2,83 @@
 
 ## What This Project Demonstrates
 
-ForwardOps Incident Console is a personal full-stack data operations project. It focuses on realistic customer-style telemetry, reliability signals, incident prioritization, and an agent-assisted triage workflow.
+Agentic Data Copilot is a personal end-to-end AI/data application. It combines dataset upload, data profiling, a PySpark materialization path, Claude-assisted code generation, a LangGraph-style agent pipeline, guarded Python execution, SSE streaming, and a React dashboard.
 
-- A local data engineering pipeline writes partitioned Parquet datasets across bronze, silver, and gold layers.
-- The backend exposes REST endpoints plus an SSE event stream for live operational updates.
-- The frontend presents account health, incident prioritization, and triage in one workflow.
-- The hosted site can also run in static demo mode for GitHub Pages.
+The hosted GitHub Pages demo in `docs/` remains static and interactive for quick review. The full copilot runs through FastAPI locally or in Docker because it needs a backend process.
 
 ## Architecture
 
-### 1. Raw telemetry generation
+### 1. FastAPI intake and session storage
 
-The app seeds realistic operational telemetry for four fictional accounts:
+The backend in [`backend/fastapi_app.py`](../backend/fastapi_app.py) exposes dataset upload, sample loading, graph metadata, health checks, session listing, and SSE analysis endpoints.
 
-- Nova Retail
-- Atlas Health
-- Meridian Energy
-- Helios Logistics
+Uploaded files are stored under `backend/data/copilot_uploads/`, profiled with pandas, and registered in SQLite through [`backend/copilot/storage.py`](../backend/copilot/storage.py). The React app shows the row count, column count, numeric columns, categorical columns, and materialization engine immediately after upload.
 
-Each account has distinct workloads, recurring failure patterns, SLAs, and owner teams. That keeps the demo specific and gives the data model a more realistic shape.
+### 2. PySpark materialization path
 
-### 2. Medallion-style feature pipeline
+[`backend/copilot/spark_pipeline.py`](../backend/copilot/spark_pipeline.py) attempts to create a local PySpark session and writes:
 
-The pipeline in [`backend/data/pipeline.py`](../backend/data/pipeline.py):
+- Bronze parquet: the uploaded dataset plus ingestion metadata
+- Silver parquet: column-level feature metadata such as data type, missing count, and row count
 
-- Generates or reloads raw cluster telemetry
-- Writes a bronze Parquet dataset partitioned by date and account
-- Builds a silver feature table with reliability, queue pressure, memory pressure, and SLA drift
-- Builds gold tables for account health and incident queueing
+If Spark is not installed, the same function falls back to pandas and writes parquet outputs. That keeps the project runnable on small laptops while still preserving a real PySpark path for Docker or Spark-enabled environments.
 
-The write path uses a temp-directory swap so the UI does not read partially written Parquet datasets.
+### 3. LangGraph agent pipeline
 
-### 3. Control-plane API
+[`backend/copilot/graph.py`](../backend/copilot/graph.py) defines the staged analysis flow:
 
-The server in [`backend/main.py`](../backend/main.py) uses Python's built-in HTTP server so it runs with a small dependency footprint. It provides:
+- Planner: turns the user question and dataset profile into a concrete plan
+- Analyst: chooses data checks and analysis strategy
+- Coder: generates pandas/Plotly code
+- Executor: validates and runs the code in the sandbox
+- Summarizer: turns raw output into a readable answer
 
-- `GET /api/dashboard`
-- `GET /api/health`
-- `GET /api/incidents/<id>`
-- `POST /api/pipeline/run`
-- `POST /api/agent/triage`
-- `GET /api/events`
+When LangGraph is installed, the backend compiles the graph with `StateGraph`. If LangGraph is unavailable during tests or lightweight demos, the code runs the same nodes sequentially and emits a runtime event explaining the fallback.
 
-That gives the project both REST APIs and a live event stream.
+### 4. Claude API and tool-use integration
 
-### 4. Hosted demo mode
+[`backend/copilot/claude_client.py`](../backend/copilot/claude_client.py) wraps Anthropic's Messages API. The client declares tools for dataset profile inspection, analysis check selection, sandbox policy validation, and summary formatting.
 
-When the site is published via GitHub Pages, there is no Python backend available. The web client detects that and falls back to static demo data from [`docs/demo/dashboard.json`](./demo/dashboard.json), while preserving the same dashboard and triage experience.
+If `ANTHROPIC_API_KEY` is configured, Claude can use those tools before returning the plan, analysis notes, generated code, repair code, or summary. If the key is not configured, deterministic fallback logic keeps the demo functional and testable.
 
-That means:
+### 5. Guarded code-execution sandbox
 
-- Visitors can see and interact with the project immediately
-- The hosted page stays functional without a running server
-- The full local backend remains available for deeper demos and code review
+[`backend/copilot/sandbox.py`](../backend/copilot/sandbox.py) makes generated code visible and controlled:
 
-### 5. Agent-assisted incident triage
+- Parses the generated code with `ast`
+- Blocks imports, file access, network-style modules, unsafe builtins, and dunder attribute access
+- Runs approved code in a separate multiprocessing worker
+- Provides only `df`, `pd`, `px`, `go`, and safe builtins
+- Captures stdout, errors, Plotly figure JSON, and execution traces
+- Terminates the worker on timeout
 
-The triage flow in [`backend/agents/graph.py`](../backend/agents/graph.py) is structured as staged tool use:
+If the first generated code attempt fails, the Executor node asks Claude for a repair when available, then retries with the same sandbox policy.
 
-- Frame the incident
-- Measure account blast radius
-- Pull comparable failures
-- Build a runbook
-- Draft a stakeholder-facing update
+### 6. React dashboard and SSE streaming
 
-This is a grounded, inspectable workflow rather than a vague text generator.
+[`web/src/App.jsx`](../web/src/App.jsx) is the full copilot UI. It shows:
 
-## Project Summary
+- Upload/sample controls
+- Runtime capability chips
+- Dataset profile
+- Planner/Analyst/Coder/Executor/Summarizer stage cards
+- Generated Python code
+- Sandbox validation and execution traces
+- stdout and errors
+- Plotly chart output
+- Final summary
 
-Use language like this:
+The analysis endpoint uses SSE. Because the request needs a JSON body, the React client uses `fetch()` with a streaming reader and parses SSE packets manually in [`web/src/api.js`](../web/src/api.js).
 
-> I built a personal data operations console for multi-account workloads. It simulates production-style telemetry, materializes bronze/silver/gold Parquet datasets, surfaces account health and prioritized incidents, and includes an agent-assisted triage flow that streams a runbook and stakeholder update back to the UI over SSE. I also added a GitHub Pages-safe demo mode so the project stays interactive when hosted statically.
+## How To Demo It
 
-## Suggested Resume Framing
+1. Run `docker compose up --build`.
+2. Open `http://127.0.0.1:8000`.
+3. Click `Load sample dataset`.
+4. Ask the default question or upload a CSV/Excel file.
+5. Click `Run analysis graph`.
+6. Walk through the streamed events, generated code, sandbox traces, chart, and summary.
 
-Keep it honest and specific:
+## Hosted Demo Mode
 
-- Built an end-to-end data operations console for multi-account workloads using Python, Parquet, SQLite, REST APIs, and SSE streaming.
-- Designed a medallion-style telemetry pipeline that transforms raw cluster signals into reliability features, account health scoring, and incident prioritization.
-- Implemented an agent-assisted triage workflow and a GitHub Pages-compatible demo mode so the project remains interactive without a local backend.
+The public GitHub Pages link serves the static dashboard from `docs/`. It is intentionally lightweight so reviewers can click something immediately. The README explains that the full copilot requires local/Docker execution because GitHub Pages cannot run FastAPI, PySpark, SQLite writes, Claude API calls, or Python sandbox processes.
