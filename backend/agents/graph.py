@@ -82,7 +82,7 @@ def run_triage(run_id: str, incident_id: str, repository, publish=None, pause_se
     customer_update = draft_customer_update(incident, customer, runbook)
     emit(
         "customer-update",
-        "Prepared the customer-facing summary",
+        "Prepared the stakeholder update",
         customer_update,
     )
 

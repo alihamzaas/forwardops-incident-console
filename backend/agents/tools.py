@@ -21,7 +21,7 @@ RUNBOOK_LIBRARY = {
         "root_cause": "One or two keys are dominating partition sizes and forcing large shuffle retries.",
         "actions": [
             "Salt the hot key and raise shuffle partition count for this workload.",
-            "Backfill the heaviest partition range first to unblock customer-facing freshness.",
+            "Backfill the heaviest partition range first to unblock downstream freshness.",
             "Capture a skew snapshot so the customer team can see exactly which dimension exploded.",
         ],
         "deployment": [
@@ -35,7 +35,7 @@ RUNBOOK_LIBRARY = {
         "actions": [
             "Retry against a warm metastore replica and move the publish off the busiest minute of the window.",
             "Cache the manifest lookup for repeated read-heavy stages.",
-            "Add a customer-facing status note because the pipeline can recover without data loss.",
+            "Add a stakeholder status note because the pipeline can recover without data loss.",
         ],
         "deployment": [
             "Validate catalog connectivity in staging.",

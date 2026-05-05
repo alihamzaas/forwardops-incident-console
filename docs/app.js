@@ -75,7 +75,7 @@ async function runPipeline() {
   updateActionState();
 
   if (state.demoMode) {
-    prependActivity("pipeline", "Demo pipeline replay", "Simulating a hosted refresh using the static portfolio dataset.");
+    prependActivity("pipeline", "Demo pipeline replay", "Simulating a hosted refresh using the static demo dataset.");
     setPipelineStatus("Replaying the GitHub Pages demo pipeline...");
     renderActivityLog();
 
@@ -337,7 +337,7 @@ function buildDemoReport(incident) {
     },
     {
       stage: "customer-update",
-      title: "Prepared the customer-facing summary",
+      title: "Prepared the stakeholder update",
       detail: `We identified the main issue behind ${incident.workload_name} for ${incident.customer_name}. ${template.rootCause} The top remediation step is to ${template.actions[0].toLowerCase()}.`,
       metrics: {},
     },
