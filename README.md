@@ -1,5 +1,7 @@
 # ForwardOps Incident Console
 
+[Live Demo](https://alihamzaas.github.io/forwardops-incident-console/) | [Project Walkthrough](./docs/project-walkthrough.md)
+
 ForwardOps Incident Console is a personal full-stack data operations project. It simulates production-style workload telemetry, turns raw operational signals into account health and incident features, and provides an interactive dashboard for triage and recovery planning.
 
 ## What It Does
