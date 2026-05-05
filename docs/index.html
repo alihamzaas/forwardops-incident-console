@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ForwardOps Incident Console</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Oracle FDE-style Demo</p>
+          <h1>ForwardOps Incident Console</h1>
+          <p class="hero-text">
+            A portfolio-ready incident console with a real local backend and a
+            hosted demo mode for GitHub Pages. It showcases partitioned Parquet
+            telemetry, customer health, live SSE updates, and agentic triage.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button id="refresh-dashboard" class="button button-ghost">Refresh</button>
+          <button id="run-pipeline" class="button button-primary">Rebuild Feature Pipeline</button>
+          <button id="run-agent" class="button button-secondary" disabled>Launch Triage Agent</button>
+        </div>
+      </header>
+
+      <section class="status-strip">
+        <div>
+          <span class="status-label">Control Plane</span>
+          <strong id="pipeline-status">Loading operational state…</strong>
+        </div>
+        <div>
+          <span class="status-label">Selected Incident</span>
+          <strong id="selected-incident-label">Choose an incident</strong>
+        </div>
+      </section>
+
+      <main class="dashboard-grid">
+        <section class="panel metrics-panel">
+          <div class="panel-header">
+            <h2>Fleet Health</h2>
+            <p>Live summary across customer accounts and recent telemetry.</p>
+          </div>
+          <div id="metric-cards" class="metric-cards"></div>
+        </section>
+
+        <section class="panel customer-panel">
+          <div class="panel-header">
+            <h2>Customer Health</h2>
+            <p>Who needs attention and where the risk is clustering.</p>
+          </div>
+          <div id="customer-table" class="table-shell"></div>
+        </section>
+
+        <section class="panel incident-panel">
+          <div class="panel-header">
+            <h2>Incident Queue</h2>
+            <p>Operational issues prioritized for forward-deployed response.</p>
+          </div>
+          <div id="incident-list" class="incident-list"></div>
+        </section>
+
+        <section class="panel detail-panel">
+          <div class="panel-header">
+            <h2>Incident Detail</h2>
+            <p>Root-cause signals, customer impact, and execution hints.</p>
+          </div>
+          <div id="incident-detail" class="detail-shell"></div>
+        </section>
+
+        <section class="panel triage-panel">
+          <div class="panel-header">
+            <h2>Agentic Triage</h2>
+            <p>Streams live backend events locally and simulates them when hosted statically.</p>
+          </div>
+          <div id="agent-report" class="agent-shell"></div>
+        </section>
+
+        <section class="panel activity-panel">
+          <div class="panel-header">
+            <h2>Activity Stream</h2>
+            <p>Recent platform events from the pipeline and triage agent.</p>
+          </div>
+          <div id="activity-log" class="activity-log"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

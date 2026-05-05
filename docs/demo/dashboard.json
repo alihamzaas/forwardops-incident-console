@@ -1,0 +1,144 @@
+{
+  "overview": {
+    "customer_count": 4,
+    "average_health_score": 51.3,
+    "high_priority_incidents": 4,
+    "jobs_last_7d": 84,
+    "latest_event_at": "2026-04-24T09:39:00",
+    "last_pipeline_run_at": "2026-04-24T17:20:00+00:00"
+  },
+  "customers": [
+    {
+      "customer_id": "nova-retail",
+      "customer_name": "Nova Retail",
+      "cluster_name": "spark-lakehouse-a",
+      "open_incidents": 6,
+      "at_risk_workload": "recommendation_features",
+      "success_rate_pct": 52.4,
+      "customer_health_score": 25.0,
+      "risk_band": "critical"
+    },
+    {
+      "customer_id": "atlas-health",
+      "customer_name": "Atlas Health",
+      "cluster_name": "hipaa-feature-fabric",
+      "open_incidents": 3,
+      "at_risk_workload": "member_risk_scoring",
+      "success_rate_pct": 66.7,
+      "customer_health_score": 55.0,
+      "risk_band": "watch"
+    },
+    {
+      "customer_id": "helios-logistics",
+      "customer_name": "Helios Logistics",
+      "cluster_name": "route-optimizer-farm",
+      "open_incidents": 3,
+      "at_risk_workload": "route_optimizer_features",
+      "success_rate_pct": 66.7,
+      "customer_health_score": 59.1,
+      "risk_band": "watch"
+    },
+    {
+      "customer_id": "meridian-energy",
+      "customer_name": "Meridian Energy",
+      "cluster_name": "forecast-hpc-grid",
+      "open_incidents": 3,
+      "at_risk_workload": "load_forecast_training",
+      "success_rate_pct": 76.2,
+      "customer_health_score": 66.0,
+      "risk_band": "watch"
+    }
+  ],
+  "incidents": [
+    {
+      "incident_id": "inc-meridian-0424-0207",
+      "customer_id": "meridian-energy",
+      "customer_name": "Meridian Energy",
+      "workload_name": "load_forecast_training",
+      "event_ts": "2026-04-24T03:27:00",
+      "failure_category": "skewed_shuffle",
+      "severity": "high",
+      "reliability_score": 28.0,
+      "queue_pressure_score": 35.0,
+      "memory_pressure_score": 35.2,
+      "latency_over_sla_min": 15,
+      "queue_depth": 7,
+      "memory_utilization_pct": 78,
+      "user_impact": "Cluster runtime expanded and the SLA window is at risk.",
+      "recommended_action": "Salt the skewed key, raise shuffle partitions, and backfill the worst partition range.",
+      "customer_summary": "Meridian Energy load_forecast_training is degraded because of skewed shuffle.",
+      "summary_line": "skewed shuffle on load_forecast_training for Meridian Energy with reliability 28.0."
+    },
+    {
+      "incident_id": "inc-helios-0424-0206",
+      "customer_id": "helios-logistics",
+      "customer_name": "Helios Logistics",
+      "workload_name": "route_optimizer_features",
+      "event_ts": "2026-04-24T03:20:00",
+      "failure_category": "queue_saturation",
+      "severity": "high",
+      "reliability_score": 27.7,
+      "queue_pressure_score": 100.0,
+      "memory_pressure_score": 16.4,
+      "latency_over_sla_min": 39,
+      "queue_depth": 20,
+      "memory_utilization_pct": 81,
+      "user_impact": "Shared cluster is saturated; customer dashboards may lag.",
+      "recommended_action": "Move the workload to a reserved pool and shift the low-priority jobs out of the same window.",
+      "customer_summary": "Helios Logistics route_optimizer_features is degraded because of queue saturation.",
+      "summary_line": "queue saturation on route_optimizer_features for Helios Logistics with reliability 27.7."
+    },
+    {
+      "incident_id": "inc-nova-0423-0195",
+      "customer_id": "nova-retail",
+      "customer_name": "Nova Retail",
+      "workload_name": "recommendation_features",
+      "event_ts": "2026-04-23T03:41:00",
+      "failure_category": "executor_oom",
+      "severity": "high",
+      "reliability_score": 8.0,
+      "queue_pressure_score": 40.0,
+      "memory_pressure_score": 68.2,
+      "latency_over_sla_min": 20,
+      "queue_depth": 8,
+      "memory_utilization_pct": 94,
+      "user_impact": "Feature refresh delayed; agent recommendations are partially stale.",
+      "recommended_action": "Increase executor memory for the hot stage, rebalance partitions, and re-run the failed slice.",
+      "customer_summary": "Nova Retail recommendation_features is failed because of executor oom.",
+      "summary_line": "executor oom on recommendation_features for Nova Retail with reliability 8.0."
+    },
+    {
+      "incident_id": "inc-atlas-0421-0168",
+      "customer_id": "atlas-health",
+      "customer_name": "Atlas Health",
+      "workload_name": "claims_feature_extract",
+      "event_ts": "2026-04-21T01:29:00",
+      "failure_category": "metadata_timeout",
+      "severity": "high",
+      "reliability_score": 50.5,
+      "queue_pressure_score": 40.0,
+      "memory_pressure_score": 6.0,
+      "latency_over_sla_min": 4,
+      "queue_depth": 8,
+      "memory_utilization_pct": 53,
+      "user_impact": "Downstream publish paused while metastore retries cleared.",
+      "recommended_action": "Retry against a warm catalog replica and stagger metadata-heavy jobs away from the publish window.",
+      "customer_summary": "Atlas Health claims_feature_extract is failed because of metadata timeout.",
+      "summary_line": "metadata timeout on claims_feature_extract for Atlas Health with reliability 50.5."
+    }
+  ],
+  "pipeline_runs": [],
+  "agent_runs": [],
+  "pipeline_state": {
+    "run_id": "demo-snapshot",
+    "finished_at": "2026-04-24T17:20:00+00:00"
+  },
+  "recent_activity": [
+    {
+      "kind": "bootstrap",
+      "title": "Hosted demo ready",
+      "detail": "Loaded the GitHub Pages snapshot for the ForwardOps Incident Console.",
+      "timestamp": "2026-04-24T18:00:00+00:00"
+    }
+  ]
+}
